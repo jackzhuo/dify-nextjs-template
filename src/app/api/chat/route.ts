@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createDifyClient } from '@/lib/dify-client';
 import { getDifyConfig } from '@/lib/env';
 
+// 配置Edge Runtime用于Cloudflare Pages兼容性
+export const runtime = 'edge';
+
 // POST: 聊天API（支持流式和阻塞式）
 export async function POST(request: NextRequest) {
   try {

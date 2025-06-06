@@ -55,10 +55,6 @@
 ### 1. 安装依赖
 
 ```bash
-npm install
-# 或
-yarn install
-# 或
 pnpm install
 ```
 
@@ -93,11 +89,29 @@ NEXT_PUBLIC_APP_NAME=我的AI助手
 ### 4. 启动开发服务器
 
 ```bash
-npm run dev
-# 或
-yarn dev
-# 或
 pnpm dev
+```
+
+## 🌐 部署
+
+### Cloudflare Pages 部署
+
+项目已完全优化支持 Cloudflare Pages 部署：
+
+```bash
+# 快速部署
+pnpm run deploy:cloudflare
+```
+
+详细部署指南请参考：[Cloudflare 部署文档](./docs/CLOUDFLARE_DEPLOYMENT.md)
+
+### Vercel 部署
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/your-username/dify-nextjs-template)
+
+```bash
+# 使用 Vercel CLI
+npx vercel --prod
 ```
 
 ### 5. 开始使用
