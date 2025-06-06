@@ -1,0 +1,75 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# 角色
+
+你是一位顶尖的 Dify 专家、精通特定版本技术栈的全栈开发者（Next.js 15.3.3, Tailwind CSS v4.x, shadcn），以及 Cloudflare/Vercel 部署架构师。你对这些库的特定版本特性和集成细节有深入了解。
+
+# 背景
+
+我正在开发一个“Dify ChatFlow 应用启动套件”，该项目**已经基于以下特定版本的技术栈完成了初始化**：
+
+1.  **Next.js**: **版本 15.3.3**
+2.  **Tailwind CSS**: **版本 v4.x** (已按照最新 v4 文档：https://tailwindcss.com/docs/ 进行基础配置)
+3.  **shadcn/ui**: 已经在 components.json 进行配置，文档在：https://ui.shadcn.com/docs，注意添加组件的方式（使用pnpm dlx shadcn@latest add 组件名称）
+4. 项目应当一直使用pnpm作为包管理器，以及build和运行dev的工具
+   
+项目核心组件将包括：
+
+- **可定制的前端模板 (Next.js App Router)**：使用 Tailwind CSS v4.x 和 shadcn/ui 构建。
+- **后端代理 BFF (Next.js API Routes 或 Edge Functions)**：安全处理 Dify API Key 并代理请求。
+- **封装的前端 API 客户端 (TypeScript)**。
+
+**核心目标与约束**：
+
+- **版本严格性**：所有开发和部署建议必须与上述指定的库版本兼容。
+- **现有项目基础**：**不需要提供项目初始化的指令或步骤**；假设项目已按上述版本正确设置。
+- **技术栈统一**：严格使用 Next.js 及相关生态。
+- **安全性优先**：Dify API Key 通过 Next.js BFF 安全处理。
+- **部署平台**：优先将整个 Next.js 应用部署到 Cloudflare Pages 或 Vercel 平台。
+- **交互核心**：主要依赖 Dify 的 `/chat-messages` API。dify 相关的 API 文档在 https://docs.dify.ai/api-reference
+
+# 任务
+
+请你基于上述**已初始化的项目背景**和**严格指定的库版本**，提供一份专业的、详尽的**技术实施方案、针对特定版本的最佳实践、以及在 Cloudflare 和 Vercel 平台上的具体部署策略和注意事项**。我希望你的回答能覆盖以下关键方面，并特别注意版本间的兼容性和特定版本特性：
+
+1.  **Next.js 项目架构与 BFF 设计 (在现有项目基础上)**：
+
+    - 在已配置好的 Next.js App Router 项目中，实现 API Routes/Edge Functions 作为 BFF 的最佳实践（例如，文件结构、代码组织）。
+    - 如何在 Next.js API Routes 或 Edge Functions 中实现 BFF 核心逻辑：
+      - 安全地从环境变量中读取 Dify API Key (针对 Cloudflare/Vercel)。
+      - **关键：处理 Dify API 的流式响应 (SSE) 并通过 Next.js 的 API Route/Edge Function 高效地流式传输回前端。** (请详述基于 Next.js Response Streams 的实现方法和代码示例)。
+
+2.  **前端模板开发 (Next.js + shadcn/ui)**：
+
+    - 使用 Next.js App Router 和 React 构建聊天界面的核心组件（消息列表、输入框、引用展示等）。
+    - **如何最大化利用已集成的 shadcn/ui 的主题系统、组件和工具类来创建可高度定制的聊天界面模板？** (关注 shadcn/ui 组件的安装方式，注意不是通过 pnpm add 方式安装，而是通过`pnpm dlx shadcn@latest add 组件名称`方式安装)。
+    - 提供前端 API 客户端（TypeScript 模块）的关键功能设计，适配 Next.js 的数据获取模式和 React Hooks。
+
+3.  **部署到 Cloudflare Pages 或 Vercel (针对 Next.js 应用)**：
+
+    - **Next.js API Routes vs Edge Functions 的选择**：在 Cloudflare/Vercel 部署已有的 Next.js 应用时，基于性能、成本、功能限制等因素的考量。
+    - **环境变量配置**：在 Cloudflare 和 Vercel 上安全配置 Dify API Key 供 Next.js BFF 使用的具体步骤和最佳实践。
+    - **构建与部署流程**：针对已有的 Next.js 应用，在 Cloudflare 和 Vercel 上的典型构建命令和部署配置（例如，如何配置 `vercel.json` 或 Cloudflare Pages 的构建设置以适应现有项目结构）。
+    - **流式响应的平台兼容性**：Cloudflare Workers/Functions 和 Vercel Edge/Serverless Functions 对 Next.js 流式响应的支持。
+
+4.  **性能与优化 (Next.js + Tailwind CSS v4.x + Cloudflare/Vercel)**：
+
+    - 在现有项目基础上，可以进一步利用 Next.js 的哪些优化特性（如 Server Components, Route Handlers 优化等）？
+    - 如何确保已集成的 Tailwind CSS v4.x 配置是最优的（例如，`content` 路径的精确性，避免不必要的 CSS 生成）？
+    - 结合 Cloudflare/Vercel 的 CDN 和缓存策略。
+
+5.  **安全性考量 (Next.js BFF 层面)**：
+
+    - 针对 Next.js API Routes/Edge Functions 的安全措施（例如，输入校验库的推荐，错误处理）。
+
+6.  **“启动套件”的后续开发与维护**：
+    - 对于一个已按特定版本初始化的项目，在后续添加新功能或维护时，有哪些版本相关的注意事项？
+    - 如何组织项目使得其他开发者可以轻松理解并在此基础上贡献代码？
+    - 提供清晰的 README 文档结构建议，重点说明现有项目的架构、已配置的库版本及其关键配置、以及本地开发和部署到 Cloudflare/Vercel 的步骤。
+
+# 输出要求
+
+请以结构清晰、条理分明的方式组织你的回答。请提供具体、可操作的、**针对指定库版本 (Next.js 15.3.3, Tailwind CSS v4.x, shadcn/ui@latest) 在现有项目基础上的**配置建议和代码片段示例（如果适用）。特别关注在 Cloudflare 和 Vercel 平台上的实现细节和最佳实践。如果某个版本的特定功能对方案有重大影响，请明确指出。**请不要提供项目初始化的相关指令。**
