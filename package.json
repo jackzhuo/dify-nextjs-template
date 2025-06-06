@@ -8,6 +8,8 @@
     "start": "next start",
     "lint": "next lint",
     "deploy:cloudflare": "bash scripts/deploy-cloudflare.sh",
+    "deploy:cloudflare-cli": "bash scripts/deploy-cloudflare-cli.sh",
+    "deploy:cloudflare-token": "bash scripts/deploy-cloudflare-token.sh",
     "build:cloudflare": "next build"
   },
   "dependencies": {
