@@ -59,6 +59,22 @@ export interface Conversation {
   updated_at: number;
 }
 
+export interface AppInfo {
+  name: string;
+  description: string;
+  tags: string[];
+}
+
+export interface AppParameters {
+  user_input_form?: Array<{
+    variable: string;
+    label: string;
+    required: boolean;
+    max_length?: number;
+    default?: string;
+  }>;
+}
+
 export class DifyClient {
   private apiKey: string;
   private baseURL: string;
@@ -303,6 +319,16 @@ export class DifyClient {
       method: 'POST',
       body: JSON.stringify({ rating, user }),
     });
+  }
+
+  // 获取应用基本信息
+  async getAppInfo(): Promise<AppInfo> {
+    return this.makeRequest<AppInfo>('/info');
+  }
+
+  // 获取应用参数
+  async getAppParameters(): Promise<AppParameters> {
+    return this.makeRequest<AppParameters>('/parameters');
   }
 }
 

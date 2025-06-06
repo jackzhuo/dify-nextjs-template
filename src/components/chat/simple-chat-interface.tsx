@@ -4,333 +4,23 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Alert, AlertDescription } from "@/components/ui/alert";
 import {
   MessageSquare,
-  Key,
-  ExternalLink,
-  Github,
-  CheckCircle,
-  AlertCircle,
-  Settings,
-  Info,
   ChevronDown,
 } from "lucide-react";
 import { Markdown } from "@/components/ui/markdown";
 
-interface DifyChatPageProps {
-  // 从服务端传递的配置
-  initialApiKey?: string;
+interface SimpleChatInterfaceProps {
+  user: string;
+  apiKey: string;
   baseURL: string;
-  appConfig: {
-    name: string;
-    description: string;
-    defaultUserId: string;
-    siteUrl: string;
-  };
-  chatConfig: {
-    enableStreaming: boolean;
-    enableFileUpload: boolean;
-    maxFiles: number;
-    maxFileSize: number;
-    acceptedFileTypes: string[];
-    showDebugInfo: boolean;
-    showSuggestedQuestions: boolean;
-    apiTimeout: number;
-    enableRequestLogging: boolean;
-  };
-  envValidation?: {
-    isValid: boolean;
-    missingVars: string[];
-    warnings: string[];
-  };
 }
 
-export function DifyChatPage({
-  initialApiKey,
-  baseURL,
-  appConfig,
-  envValidation,
-}: DifyChatPageProps) {
-  const [apiKey, setApiKey] = useState(initialApiKey || "");
-  const [isConnected, setIsConnected] = useState(false);
-  const [error, setError] = useState<string>("");
-  
-  // 避免未使用变量警告
-//   console.log('Chat config available:', chatConfig);
-
-  // 自动连接逻辑
-  useEffect(() => {
-    console.log("Initial API Key:", initialApiKey);
-    console.log("Base URL:", baseURL);
-    
-    // 如果环境变量中已配置API Key，自动连接
-          if (initialApiKey && envValidation?.isValid) {
-        setIsConnected(true);
-        setApiKey(initialApiKey);
-      }
-  }, [initialApiKey, baseURL, envValidation?.isValid]);
-
-  const handleConnect = () => {
-    const keyToUse = apiKey.trim() || initialApiKey;
-
-    if (!keyToUse) {
-      setError("请输入API Key");
-      return;
-    }
-
-    setIsConnected(true);
-    setError("");
-  };
-
-  const handleDisconnect = () => {
-    setIsConnected(false);
-    setApiKey("");
-    setError("");
-  };
-
-  return (
-    <div className="min-h-screen bg-background">
-      {/* 头部 */}
-      <header className="border-b bg-white/50 backdrop-blur-sm sticky top-0 z-50">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-                <MessageSquare className="w-5 h-5 text-primary-foreground" />
-              </div>
-              <div>
-                <h1 className="text-xl font-bold">{appConfig.name}</h1>
-                <p className="text-sm text-muted-foreground">
-                  {appConfig.description}
-                </p>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-4">
-              <Badge variant="outline" className="gap-1">
-                <CheckCircle className="w-3 h-3" />
-                Next.js 15
-              </Badge>
-              <Badge variant="outline" className="gap-1">
-                <CheckCircle className="w-3 h-3" />
-                TypeScript
-              </Badge>
-              <Badge variant="outline" className="gap-1">
-                <CheckCircle className="w-3 h-3" />
-                Tailwind CSS
-              </Badge>
-
-              <Button variant="outline" size="sm" asChild>
-                <a
-                  href="https://docs.dify.ai/api-reference"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="gap-1"
-                >
-                  <ExternalLink className="w-3 h-3" />
-                  API文档
-                </a>
-              </Button>
-
-              <Button variant="outline" size="sm" asChild>
-                <a
-                  href="https://github.com"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="gap-1"
-                >
-                  <Github className="w-3 h-3" />
-                  源码
-                </a>
-              </Button>
-            </div>
-          </div>
-        </div>
-      </header>
-
-      <div className="container mx-auto px-4 py-8">
-        {!isConnected ? (
-          // 连接配置界面
-          <div className="max-w-2xl mx-auto space-y-6">
-            <div className="text-center space-y-4">
-              <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto">
-                <Key className="w-8 h-8 text-primary" />
-              </div>
-              <div>
-                <h2 className="text-2xl font-bold">连接到Dify</h2>
-                <p className="text-muted-foreground mt-2">
-                  {initialApiKey
-                    ? "检测到环境变量中的API Key，点击连接即可开始使用"
-                    : "请输入您的Dify API Key以开始使用聊天功能"}
-                </p>
-              </div>
-            </div>
-
-            {/* 环境变量验证提示 */}
-            {envValidation && !envValidation.isValid && (
-              <Alert variant="destructive">
-                <AlertCircle className="h-4 w-4" />
-                <AlertDescription>
-                  <div className="space-y-1">
-                    <div className="font-medium">缺少必需的环境变量:</div>
-                    <ul className="list-disc list-inside text-sm">
-                      {envValidation.missingVars.map((varName, index) => (
-                        <li key={index}>{varName}</li>
-                      ))}
-                    </ul>
-                  </div>
-                </AlertDescription>
-              </Alert>
-            )}
-
-            {/* 环境变量警告 */}
-            {envValidation && envValidation.warnings.length > 0 && (
-              <Alert>
-                <Info className="h-4 w-4" />
-                <AlertDescription>
-                  <div className="space-y-1">
-                    <div className="font-medium">建议配置:</div>
-                    <ul className="list-disc list-inside text-sm">
-                      {envValidation.warnings.map((warning, index) => (
-                        <li key={index}>{warning}</li>
-                      ))}
-                    </ul>
-                  </div>
-                </AlertDescription>
-              </Alert>
-            )}
-
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Settings className="w-5 h-5" />
-                  API配置
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="space-y-2">
-                  <label htmlFor="apikey" className="text-sm font-medium">
-                    Dify API Key
-                  </label>
-                  <Input
-                    id="apikey"
-                    type="password"
-                    value={apiKey}
-                    onChange={(e) => setApiKey(e.target.value)}
-                    placeholder={
-                      initialApiKey
-                        ? "已从环境变量加载 API Key（可覆盖输入）"
-                        : "输入您的Dify API Key"
-                    }
-                    className="font-mono"
-                  />
-                  <p className="text-xs text-muted-foreground">
-                    您可以在Dify控制台的应用设置中获取API Key
-                  </p>
-                </div>
-
-                {error && (
-                  <Alert variant="destructive">
-                    <AlertCircle className="h-4 w-4" />
-                    <AlertDescription>{error}</AlertDescription>
-                  </Alert>
-                )}
-
-                <Button
-                  onClick={handleConnect}
-                  className="w-full"
-                  disabled={!apiKey.trim() && !initialApiKey}
-                >
-                  {initialApiKey ? "使用环境变量连接" : "连接到Dify"}
-                </Button>
-              </CardContent>
-            </Card>
-
-            {/* 功能特性展示 */}
-            <div className="grid md:grid-cols-2 gap-4">
-              <Card>
-                <CardContent className="p-4">
-                  <h3 className="font-semibold mb-2">🚀 现代化技术栈</h3>
-                  <ul className="text-sm text-muted-foreground space-y-1">
-                    <li>• Next.js 15 App Router</li>
-                    <li>• TypeScript 类型安全</li>
-                    <li>• Tailwind CSS + shadcn/ui</li>
-                    <li>• 响应式设计</li>
-                  </ul>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardContent className="p-4">
-                  <h3 className="font-semibold mb-2">💬 完整聊天功能</h3>
-                  <ul className="text-sm text-muted-foreground space-y-1">
-                    <li>• 流式/阻塞式对话</li>
-                    <li>• 文件上传支持</li>
-                    <li>• 对话历史管理</li>
-                    <li>• 消息反馈系统</li>
-                  </ul>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardContent className="p-4">
-                  <h3 className="font-semibold mb-2">🔧 开发者友好</h3>
-                  <ul className="text-sm text-muted-foreground space-y-1">
-                    <li>• 类型安全的API封装</li>
-                    <li>• React Hooks集成</li>
-                    <li>• 组件化设计</li>
-                    <li>• 易于扩展</li>
-                  </ul>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardContent className="p-4">
-                  <h3 className="font-semibold mb-2">🎯 Dify集成</h3>
-                  <ul className="text-sm text-muted-foreground space-y-1">
-                    <li>• 完整API覆盖</li>
-                    <li>• 错误处理机制</li>
-                    <li>• 建议问题支持</li>
-                    <li>• 元数据展示</li>
-                  </ul>
-                </CardContent>
-              </Card>
-            </div>
-          </div>
-        ) : (
-          // 聊天界面
-          <div className="max-w-4xl mx-auto">
-            <div className="mb-4 flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Badge variant="default" className="gap-1">
-                  <CheckCircle className="w-3 h-3" />
-                  已连接
-                </Badge>
-                <span className="text-sm text-muted-foreground">
-                  API Key: {(apiKey || initialApiKey || "").slice(0, 8)}...
-                </span>
-              </div>
-              <Button variant="outline" size="sm" onClick={handleDisconnect}>
-                断开连接
-              </Button>
-            </div>
-
-            <div className="h-[calc(100vh-200px)]">
-              <SimpleChatInterface
-                user={appConfig.defaultUserId}
-              />
-            </div>
-          </div>
-        )}
-      </div>
-    </div>
-  );
-}
-
-// 简单的聊天界面组件
-function SimpleChatInterface({ user }: { user: string }) {
+export function SimpleChatInterface({ 
+  user, 
+  apiKey, 
+  baseURL 
+}: SimpleChatInterfaceProps) {
   const [messages, setMessages] = useState<Array<{
     id: string;
     type: 'user' | 'assistant';
@@ -471,7 +161,9 @@ function SimpleChatInterface({ user }: { user: string }) {
           body: JSON.stringify({
             message: userMessage,
             user,
-            responseMode: 'streaming'
+            responseMode: 'streaming',
+            apiKey,
+            baseURL
           }),
         });
         
@@ -543,7 +235,9 @@ function SimpleChatInterface({ user }: { user: string }) {
           body: JSON.stringify({
             message: userMessage,
             user,
-            responseMode: 'blocking'
+            responseMode: 'blocking',
+            apiKey,
+            baseURL
           }),
         });
         

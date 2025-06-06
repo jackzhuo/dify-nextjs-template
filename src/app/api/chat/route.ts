@@ -5,7 +5,14 @@ import { getDifyConfig } from '@/lib/env';
 // POST: 聊天API（支持流式和阻塞式）
 export async function POST(request: NextRequest) {
   try {
-    const { message, user, conversationId, responseMode = 'blocking' } = await request.json();
+    const { 
+      message, 
+      user, 
+      conversationId, 
+      responseMode = 'blocking',
+      apiKey: clientApiKey,
+      baseURL: clientBaseURL 
+    } = await request.json();
 
     if (!message || !user) {
       return NextResponse.json(
@@ -14,20 +21,29 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // 从环境变量获取Dify配置
+    // 获取API配置：优先使用客户端传入的参数，否则使用环境变量
     const difyConfig = getDifyConfig();
+    const apiKey = clientApiKey || difyConfig.apiKey;
+    const baseURL = clientBaseURL || difyConfig.baseURL;
     
-    if (!difyConfig.apiKey) {
+    if (!apiKey) {
       return NextResponse.json(
-        { error: 'Dify API configuration not found' },
-        { status: 500 }
+        { error: 'Dify API key not provided' },
+        { status: 400 }
+      );
+    }
+
+    if (!baseURL) {
+      return NextResponse.json(
+        { error: 'Dify API base URL not provided' },
+        { status: 400 }
       );
     }
 
     // 创建Dify客户端
     const client = createDifyClient({
-      apiKey: difyConfig.apiKey,
-      baseURL: difyConfig.baseURL,
+      apiKey,
+      baseURL,
     });
 
     // 根据响应模式处理请求
